@@ -1,2 +1,50 @@
+# ============================================================================
+# ENDPOINTS.YML - Configuración de Endpoints
+# ============================================================================
+# Este archivo define dónde RASA se conecta con servicios externos y
+# dónde ubicar el servidor de acciones personalizadas.
+#
+# Documentación: https://rasa.com/docs/rasa/endpoints/
+# ============================================================================
+
+# ============================================================================
+# ACTION ENDPOINT - Servidor de Acciones Personalizadas
+# ============================================================================
+# Define la ubicación del servidor que ejecuta las acciones personalizadas
+# (ActionReservarCita, ActionCancelarCita, ActionConsultarCitas)
+#
+# Flujo:
+#   1. RASA decide ejecutar una acción (ej: action_reservar_cita)
+#   2. Envía un HTTP POST a este endpoint con los datos de la conversación
+#   3. El servidor (rasa run actions) procesa la solicitud
+#   4. Retorna eventos/resultados que RASA incorpora en la conversación
+#
+# URL: http://localhost:5055/webhook
+#   - localhost: La máquina local (cambiar si el servidor está en otra máquina)
+#   - 5055: Puerto por defecto de RASA SDK (acciones)
+# ============================================================================
 action_endpoint:
   url: "http://localhost:5055/webhook"
+
+# ============================================================================
+# OPTIONAL: NLU SERVER ENDPOINT
+# ============================================================================
+# Si quieres usar un servidor NLU separado (opcional, no usado aquí):
+# nlu_server:
+#   url: "http://localhost:5000"
+
+# ============================================================================
+# OPTIONAL: MODEL ENDPOINT
+# ============================================================================
+# Si quieres usar un modelo entrenado en un servidor remoto (opcional):
+# model_server:
+#   url: "http://localhost:7000"
+#   token: "mytoken"
+#   auth_token: "bearer_token"
+
+# ============================================================================
+# OPTIONAL: NLPROC ENDPOINT
+# ============================================================================
+# Para procesamiento de lenguaje externo (opcional):
+# nlg_server:
+#   url: "http://localhost:8000"

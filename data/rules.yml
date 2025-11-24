@@ -1,26 +1,105 @@
+# ============================================================================
+# RULES.YML - Reglas de Comportamiento Determinístico
+# ============================================================================
+# Las reglas definen comportamientos que SIEMPRE deben ocurrir
+# Se aplican como parte de la RulePolicy en la toma de decisiones
+#
+# Diferencia con Stories:
+#   - Rules: Comportamiento GARANTIZADO (determinístico)
+#   - Stories: Ejemplos de diálogo (para aprender patrones flexibles)
+#
+# Documentación: https://rasa.com/docs/rasa/rules/
+# ============================================================================
+
 version: "3.1"
 
 rules:
-- rule: Saludar siempre
-  steps:
-  - intent: saludar
-  - action: utter_saludar
 
-- rule: Despedir siempre
-  steps:
-  - intent: despedir
-  - action: utter_despedir
+  # =========================================================================
+  # RULE 1: SALUDAR SIEMPRE
+  # =========================================================================
+  # Regla simple: Si el usuario saluda, el bot SIEMPRE responde con saludar
+  # No hay excepciones - esta regla tiene prioridad
+  # =========================================================================
+  - rule: Saludar siempre
+    # Condición: El usuario emite el intent "saludar"
+    steps:
+    - intent: saludar
+    
+    # Acción: El bot responde con la respuesta "utter_saludar"
+    - action: utter_saludar
 
-- rule: Activar form de cita
-  steps:
-  - intent: pedir_cita
-  - action: cita_form
-  - active_loop: cita_form
+  # =========================================================================
+  # RULE 2: DESPEDIR SIEMPRE
+  # =========================================================================
+  # Regla simple: Si el usuario se despide, el bot SIEMPRE responde despidiendo
+  # =========================================================================
+  - rule: Despedir siempre
+    steps:
+    - intent: despedir
+    - action: utter_despedir
 
-- rule: Enviar form de cita
-  condition:
-  - active_loop: cita_form
-  steps:
-  - action: cita_form
-  - active_loop: null
-  - action: action_reservar_cita
+  # =========================================================================
+  # RULE 3: ACTIVAR FORMULARIO DE CITA
+  # =========================================================================
+  # Regla compleja: Cuando el usuario pide cita, activar el formulario
+  # - intent: pedir_cita   → Usuario solicita cita
+  # - action: cita_form    → Ejecutar el formulario
+  # - active_loop: cita_form → Marcar que el formulario está activo
+  #
+  # El formulario automáticamente solicita cada slot requerido (nombre, fecha, especialidad)
+  # hasta que estén completos
+  # =========================================================================
+  - rule: Activar form de cita
+    # Condición: El usuario pide una cita
+    steps:
+    - intent: pedir_cita
+    
+    # Acción 1: Ejecutar el formulario
+    - action: cita_form
+    
+    # Acción 2: Marcar que el formulario está activo
+    # Esto previene que otras políticas interfieran mientras se completa el form
+    - active_loop: cita_form
+
+  # =========================================================================
+  # RULE 4: COMPLETAR FORMULARIO DE CITA
+  # =========================================================================
+  # Regla compleja: Cuando el formulario de cita está completado, ejecutar la acción
+  #
+  # Esta regla tiene condiciones:
+  #   - condition: active_loop: cita_form
+  #     Solo se ejecuta si el formulario está activo
+  #
+  # Pasos:
+  #   1. action: cita_form          → Validar slots finales
+  #   2. active_loop: null          → Cerrar el formulario (establecer a null)
+  #   3. action: action_reservar_cita → Ejecutar lógica de reserva
+  #
+  # Flujo completo:
+  #   Usuario: "Necesito una cita"
+  #   Bot: (Activa form - RULE 3)
+  #   Bot: "¿Nombre?"
+  #   Usuario: "Juan García" (se extrae entidad nombre → se llena slot)
+  #   Bot: "¿Fecha?"
+  #   Usuario: "2025-12-20" (se extrae entidad fecha → se llena slot)
+  #   Bot: "¿Especialidad?"
+  #   Usuario: "Cardiología" (se extrae entidad especialidad → se llena slot)
+  #   → Todos los slots están completos → Se ejecuta RULE 4
+  #   Bot: (Ejecuta action_reservar_cita - confirma cita)
+  # =========================================================================
+  - rule: Enviar form de cita
+    # Condición: El formulario de cita debe estar activo
+    condition:
+    - active_loop: cita_form
+    
+    # Pasos a ejecutar
+    steps:
+    # Paso 1: Validar y completar el formulario
+    - action: cita_form
+    
+    # Paso 2: Cerrar el formulario (establecer active_loop a null)
+    - active_loop: null
+    
+    # Paso 3: Ejecutar la lógica de reserva personalizada
+    - action: action_reservar_cita

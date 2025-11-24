@@ -1,27 +1,114 @@
+# ============================================================================
+# STORIES.YML - Historias de Conversación para Entrenamiento
+# ============================================================================
+# Las historias definen conversaciones de ejemplo que usa RASA para entrenar
+# las políticas de diálogo (cómo decidir qué acción ejecutar).
+#
+# Diferencia con Rules:
+#   - Stories: Ejemplos FLEXIBLES para aprender patrones generales
+#   - Rules: Reglas RÍGIDAS que SIEMPRE se deben cumplir
+#
+# Cada historia es una secuencia de intents (entrada del usuario) y
+# acciones (respuesta del bot). RASA generaliza estos patrones para
+# manejar variaciones no vistas en el entrenamiento.
+#
+# Documentación: https://rasa.com/docs/rasa/stories/
+# ============================================================================
+
 version: "3.1"
 
 stories:
-- story: reservar cita con form
-  steps:
-  - intent: saludar
-  - action: utter_saludar
-  - intent: pedir_cita
-  - action: cita_form
-  - active_loop: cita_form
-  - active_loop: null
-  - action: action_reservar_cita
 
-- story: cancelar cita
-  steps:
-  - intent: cancelar_cita
-  - action: action_cancelar_cita
+  # =========================================================================
+  # STORY 1: RESERVAR CITA MÉDICA CON FORMULARIO
+  # =========================================================================
+  # Esta es la historia PRINCIPAL del sistema - el flujo de reserva de cita
+  #
+  # Flujo:
+  #   1. Usuario saluda → Bot responde con saludo
+  #   2. Usuario solicita cita → Bot activa formulario
+  #   3. Formulario recopila datos (nombre, fecha, especialidad)
+  #   4. Cuando todos los datos están completos, el formulario se cierra
+  #   5. Bot ejecuta la acción de reservar cita
+  #
+  # Notas técnicas:
+  #   - active_loop: cita_form → El formulario está activo recopilando datos
+  #   - active_loop: null → Se cierra el formulario (todos los slots completados)
+  # =========================================================================
+  - story: reservar cita con form
+    steps:
+      # Paso 1: Usuario saluda
+      # El modelo detecta que el usuario escribió "hola", "buenos días", etc.
+      - intent: saludar
+      
+      # Paso 2: Bot responde con saludo
+      # Se ejecuta la acción utter_saludar
+      - action: utter_saludar
+      
+      # Paso 3: Usuario solicita cita
+      # El modelo detecta intent: pedir_cita
+      - intent: pedir_cita
+      
+      # Paso 4: Activar formulario de cita
+      # Se ejecuta cita_form que automáticamente pide nombre, fecha, especialidad
+      - action: cita_form
+      
+      # Paso 5: Marcar que el formulario está activo
+      # Mientras active_loop: cita_form, el formulario maneja la conversación
+      - active_loop: cita_form
+      
+      # Paso 6: Cerrar formulario cuando está completo
+      # Todos los slots (nombre, fecha, especialidad) han sido llenados
+      - active_loop: null
+      
+      # Paso 7: Ejecutar lógica de reserva personalizada
+      # Se ejecuta la acción action_reservar_cita que guarda la cita en memoria
+      - action: action_reservar_cita
 
-- story: consultar citas
-  steps:
-  - intent: consultar_citas
-  - action: action_consultar_citas
+  # =========================================================================
+  # STORY 2: CANCELAR CITA
+  # =========================================================================
+  # Flujo simple: Usuario solicita cancelación → Bot cancela última cita
+  #
+  # Esta es una historia muy simple sin ramificaciones.
+  # Demuestra que no siempre se necesita un formulario.
+  # =========================================================================
+  - story: cancelar cita
+    steps:
+      # Usuario expresa su intención de cancelar
+      - intent: cancelar_cita
+      
+      # Bot ejecuta la acción que cancela la cita
+      # (elimina la última cita de la lista de citas_reservadas)
+      - action: action_cancelar_cita
 
-- story: despedida simple
-  steps:
-  - intent: despedir
-  - action: utter_despedir
+  # =========================================================================
+  # STORY 3: CONSULTAR CITAS
+  # =========================================================================
+  # Flujo simple: Usuario solicita ver citas → Bot lista todas las citas
+  #
+  # Similar a STORY 2, es un flujo directo sin recopilación de datos
+  # =========================================================================
+  - story: consultar citas
+    steps:
+      # Usuario expresa su intención de consultar
+      - intent: consultar_citas
+      
+      # Bot ejecuta la acción que lista todas las citas
+      # Itera sobre citas_reservadas y muestra cada una formateada
+      - action: action_consultar_citas
+
+  # =========================================================================
+  # STORY 4: DESPEDIDA SIMPLE
+  # =========================================================================
+  # Flujo simple: Usuario se despide → Bot se despide
+  #
+  # Historia de terminación de conversación
+  # =========================================================================
+  - story: despedida simple
+    steps:
+      # Usuario expresa su intención de terminar la conversación
+      - intent: despedir
+      
+      # Bot responde con una despedida
+      - action: utter_despedir

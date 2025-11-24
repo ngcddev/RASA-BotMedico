@@ -1,86 +1,196 @@
+# ============================================================================
+# DOMAIN.YML - Vocabulario y Configuración del Bot
+# ============================================================================
+# Este archivo define el "universo" del bot:
+# - Qué intents puede reconocer (intenciones del usuario)
+# - Qué entidades puede extraer (información del usuario)
+# - Qué variables mantiene en memoria (slots)
+# - Qué formularios puede usar (forms)
+# - Qué respuestas puede dar (responses)
+# - Qué acciones personalizadas puede ejecutar (actions)
+#
+# Documentación: https://rasa.com/docs/rasa/domain/
+# ============================================================================
+
+# ============================================================================
+# INTENTS - Intenciones del usuario
+# ============================================================================
+# Un intent es lo que el usuario QUIERE HACER
+# El modelo NLU aprende a reconocer cada intent a partir de ejemplos en nlu.yml
+#
+# Ejemplos:
+#   - "Hola" → intent: saludar
+#   - "Necesito una cita" → intent: pedir_cita
+#   - "Cancela mi turno" → intent: cancelar_cita
+# ============================================================================
 intents:
-  - saludar
-  - despedir
-  - afirmar
-  - negar
-  - pedir_cita
-  - cancelar_cita
-  - consultar_citas
-  - proporcionar_nombre
-  - proporcionar_fecha
-  - proporcionar_especialidad
+  - saludar              # Usuario saluda o inicia conversación
+  - despedir             # Usuario se despide
+  - afirmar              # Usuario confirma (sí, correcto, ok)
+  - negar                # Usuario rechaza (no, para nada)
+  - pedir_cita           # Usuario solicita nueva cita médica
+  - cancelar_cita        # Usuario quiere cancelar cita existente
+  - consultar_citas      # Usuario quiere ver sus citas
+  - proporcionar_nombre      # (Implícito) Usuario proporciona nombre
+  - proporcionar_fecha       # (Implícito) Usuario proporciona fecha
+  - proporcionar_especialidad # (Implícito) Usuario proporciona especialidad
 
+# ============================================================================
+# ENTITIES - Entidades (Información Estructurada)
+# ============================================================================
+# Una entidad es información ESPECÍFICA que extraemos del texto del usuario
+# Se definen con regex en nlu.yml y se extraen automáticamente
+#
+# Ejemplos:
+#   Usuario: "Mi nombre es Juan García"
+#   Entidad extraída: nombre = "Juan García"
+#
+#   Usuario: "Quiero para el lunes"
+#   Entidad extraída: fecha = "lunes"
+#
+#   Usuario: "Necesito cardiología"
+#   Entidad extraída: especialidad = "cardiología"
+# ============================================================================
 entities:
-  - nombre
-  - fecha
-  - especialidad
+  - nombre          # Nombre completo del paciente
+  - fecha           # Fecha de la cita (formato flexible: "2025-12-20", "lunes", "mañana")
+  - especialidad    # Especialidad médica (cardiología, pediatría, etc)
 
+# ============================================================================
+# SLOTS - Variables de Memoria
+# ============================================================================
+# Los slots almacenan información durante la conversación
+# Se llenan automáticamente cuando se detectan las entidades correspondientes
+# Se pueden usar en respuestas (templates) y en lógica de decisión
+#
+# Atributos:
+#   - type: Tipo de dato (text, bool, float, list, categorical)
+#   - influence_conversation: Si True, el valor del slot afecta futuras decisiones
+#   - mappings: Cómo se llena el slot (from_entity, from_intent, from_text, custom)
+# ============================================================================
 slots:
+  # Slot para guardar el nombre del paciente
   nombre:
-    type: text
-    influence_conversation: true
+    type: text                    # Tipo: texto libre
+    influence_conversation: true  # El nombre afecta la conversación (saludos personalizados)
     mappings:
-      - type: from_entity
+      - type: from_entity         # Se llena cuando se extrae la entidad "nombre"
         entity: nombre
+
+  # Slot para guardar la fecha de la cita
   fecha:
-    type: text
-    influence_conversation: true
+    type: text                    # Tipo: texto (puede ser "2025-12-20", "lunes", "mañana")
+    influence_conversation: true  # La fecha afecta la decisión de reservar
     mappings:
       - type: from_entity
         entity: fecha
+
+  # Slot para guardar la especialidad médica
   especialidad:
-    type: text
-    influence_conversation: true
+    type: text                    # Tipo: texto libre
+    influence_conversation: true  # La especialidad afecta la lógica de reserva
     mappings:
       - type: from_entity
         entity: especialidad
 
+# ============================================================================
+# FORMS - Formularios para Recopilar Información
+# ============================================================================
+# Un form es una estructura que solicita slots específicos en orden
+# El bot pregunta por cada slot hasta que todos estén completos
+#
+# Flujo:
+#   1. Usuario activa el form
+#   2. Bot pregunta por cada required_slot en orden
+#   3. Usuario proporciona valor (se extrae como entidad → se llena slot)
+#   4. Cuando todos los slots están completos, el form termina
+#   5. Se ejecuta la acción especificada (ej: action_reservar_cita)
+# ============================================================================
 forms:
+  # Formulario para recopilar datos de la cita
   cita_form:
     required_slots:
-      - nombre
-      - fecha
-      - especialidad
+      - nombre          # Primero: solicitar nombre completo
+      - fecha           # Segundo: solicitar fecha de cita
+      - especialidad    # Tercero: solicitar especialidad
 
+# ============================================================================
+# RESPONSES - Respuestas del Bot
+# ============================================================================
+# Las responses son plantillas de mensajes que el bot puede enviar
+# Se pueden usar variables {slot_name} para personalización
+# El bot selecciona qué respuesta enviar según el contexto
+# ============================================================================
 responses:
+  # Respuesta para saludar
   utter_saludar:
     - text: "¡Hola! Soy el asistente de citas médicas. ¿En qué puedo ayudarte?"
   
+  # Respuesta para despedir
   utter_despedir:
     - text: "¡Hasta luego! Que tengas un buen día."
   
+  # Preguntar por el nombre (variante 1)
   utter_preguntar_nombre:
     - text: "¿Cuál es tu nombre completo?"
   
+  # Preguntar por la fecha (variante 1, más detalles)
   utter_preguntar_fecha:
     - text: "¿Para qué fecha deseas la cita? (ejemplo: 2025-12-15 o lunes)"
   
+  # Preguntar por la especialidad (variante 1, más detalles)
   utter_preguntar_especialidad:
     - text: "¿Qué especialidad necesitas? (cardiología, pediatría, medicina general, etc.)"
   
+  # Preguntar por el nombre (variante 2 - usado por el form automático)
   utter_ask_nombre:
     - text: "¿Cuál es tu nombre completo?"
   
+  # Preguntar por la fecha (variante 2 - usado por el form automático)
   utter_ask_fecha:
     - text: "¿Para qué fecha deseas la cita? (ejemplo: 2025-12-15 o lunes)"
   
+  # Preguntar por la especialidad (variante 2 - usado por el form automático)
   utter_ask_especialidad:
     - text: "¿Qué especialidad necesitas?"
   
+  # Confirmación de cita reservada
+  # Nota: {nombre}, {fecha}, {especialidad} se reemplazan con valores de slots
   utter_cita_confirmada:
     - text: "Perfecto {nombre}, tu cita de {especialidad} ha sido reservada para el {fecha}."
   
+  # Confirmación de cita cancelada
   utter_cita_cancelada:
     - text: "Tu cita ha sido cancelada exitosamente."
   
+  # Respuesta cuando no se entiende
   utter_no_comprendo:
     - text: "Disculpa, no entendí. ¿Puedes reformular tu solicitud?"
 
+# ============================================================================
+# ACTIONS - Acciones Personalizadas
+# ============================================================================
+# Las acciones son funciones Python que ejecutan lógica de negocio
+# Se definen en actions/actions.py
+# Tipos:
+#   - action_* : Acciones personalizadas (lógica custom)
+#   - utter_* : Acciones de respuesta (enviar mensaje predefinido)
+# ============================================================================
 actions:
-  - action_reservar_cita
-  - action_cancelar_cita
-  - action_consultar_citas
+  - action_reservar_cita     # Reservar nueva cita (lógica custom)
+  - action_cancelar_cita     # Cancelar cita existente (lógica custom)
+  - action_consultar_citas   # Listar citas (lógica custom)
 
+# ============================================================================
+# SESSION CONFIG - Configuración de Sesión
+# ============================================================================
+# Define cómo se comporta RASA con las sesiones de usuario
+# ============================================================================
 session_config:
+  # Tiempo en minutos después del cual se considera una sesión como expirada
+  # Si el usuario vuelve después de este tiempo, es una nueva sesión
   session_expiration_time: 60
+  
+  # Si True, los slots se mantienen en una nueva sesión
+  # Si False, se borran todos los slots (nombre, fecha, etc) en nueva sesión
   carry_over_slots_to_new_session: true

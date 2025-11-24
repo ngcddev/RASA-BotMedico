@@ -1,35 +1,147 @@
+# ============================================================================
+# CONFIGURACIÓN DE RASA - PIPELINE NLU Y POLÍTICAS DE DIÁLOGO
+# ============================================================================
+# Este archivo define cómo RASA procesa el lenguaje natural (NLU) y cómo
+# decide qué acción tomar en cada turno de conversación (Políticas de diálogo)
+#
+# Documentación: https://rasa.com/docs/rasa/
+# ============================================================================
+
+# Versión del formato de configuración
 recipe: default.v1
+
+# Idioma del modelo (es = español)
+# RASA utilizará tokenizers y modelos específicos para este idioma
 language: es
+
+# ============================================================================
+# PIPELINE DE NLU (Natural Language Understanding)
+# ============================================================================
+# El pipeline procesa el texto del usuario en los siguientes pasos:
+#
+# 1. TOKENIZACIÓN: Divide el texto en palabras/tokens
+# 2. FEATURE EXTRACTION: Extrae características del texto (palabras, n-gramas)
+# 3. CLASSIFICATION: Clasifica el intent del usuario
+# 4. ENTITY RECOGNITION: Extrae entidades (nombre, fecha, especialidad)
+# 5. SYNONYM MAPPING: Mapea sinónimos de entidades
+# 6. RESPONSE SELECTION: Selecciona la mejor respuesta
+# 7. FALLBACK: Maneja respuestas de baja confianza
+# ============================================================================
+
 pipeline:
-- name: WhitespaceTokenizer
-- name: RegexFeaturizer
-- name: LexicalSyntacticFeaturizer
-- name: CountVectorsFeaturizer
-- name: CountVectorsFeaturizer
-  analyzer: char_wb
-  min_ngram: 1
-  max_ngram: 4
-- name: DIETClassifier
-  epochs: 200
-  entity_recognition: true
-  constrain_similarities: true
-  model_confidence: softmax
-- name: EntitySynonymMapper
-- name: ResponseSelector
-  epochs: 100
-  constrain_similarities: true
-- name: FallbackClassifier
-  threshold: 0.3
-  ambiguity_threshold: 0.1
+  # --------------------------------------------------------------------------
+  # Paso 1: TOKENIZACIÓN - Divide el texto en palabras
+  # --------------------------------------------------------------------------
+  - name: WhitespaceTokenizer
+    # Divide el texto usando espacios en blanco como delimitador
+    # Ejemplo: "necesito una cita" → ["necesito", "una", "cita"]
+
+  # --------------------------------------------------------------------------
+  # Paso 2-3: EXTRACCIÓN DE CARACTERÍSTICAS - Convierte texto a números
+  # --------------------------------------------------------------------------
+  - name: RegexFeaturizer
+    # Extrae características usando expresiones regulares
+    # Útil para detectar patrones específicos (emails, teléfonos, etc)
+
+  - name: LexicalSyntacticFeaturizer
+    # Extrae características sintácticas del texto
+    # Analiza estructura gramatical (verbos, sustantivos, etc)
+
+  - name: CountVectorsFeaturizer
+    # Vectoriza palabras individuales (bag of words)
+    # Crea vectores basados en frecuencia de palabras
+    # Ejemplo: "tengo una cita" se convierte en vector de características
+
+  - name: CountVectorsFeaturizer
+    # Segundo vectorizador para n-gramas de caracteres
+    # Útil para palabras con errores ortográficos o variaciones
+    analyzer: char_wb  # word boundary character analysis
+    min_ngram: 1       # mínimo número de caracteres por n-grama
+    max_ngram: 4       # máximo número de caracteres por n-grama
+
+  # --------------------------------------------------------------------------
+  # Paso 4-5: CLASIFICACIÓN E IDENTIFICACIÓN DE ENTIDADES
+  # --------------------------------------------------------------------------
+  - name: DIETClassifier
+    # Dual Intent and Entity Transformer Classifier
+    # Modelo de deep learning que clasifica intents Y extrae entidades simultáneamente
+    epochs: 200                    # Número de iteraciones de entrenamiento (más = mejor pero lento)
+    entity_recognition: true       # Activar reconocimiento de entidades
+    constrain_similarities: true   # Optimizar similitudes para mejor rendimiento
+    model_confidence: softmax      # Usar softmax para probabilidades normalizadas
+
+  - name: EntitySynonymMapper
+    # Mapea entidades a sinónimos definidos en el NLU
+    # Ejemplo: "cardio" → "cardiología", "Dr." → "doctor"
+
+  # --------------------------------------------------------------------------
+  # Paso 6: SELECCIÓN DE RESPUESTAS
+  # --------------------------------------------------------------------------
+  - name: ResponseSelector
+    # Selecciona la mejor respuesta predefinida del bot
+    # Se entrena similarmente al DIETClassifier
+    epochs: 100                    # Menos épocas que DIETClassifier (las respuestas son más estables)
+    constrain_similarities: true   # Optimización de similitudes
+
+  # --------------------------------------------------------------------------
+  # Paso 7: FALLBACK - Manejo de baja confianza
+  # --------------------------------------------------------------------------
+  - name: FallbackClassifier
+    # Detecta cuando la confianza de la predicción es baja
+    # Si está por debajo del threshold, activa el fallback
+    threshold: 0.3                 # Si confianza < 30%, considerar como fallback
+    ambiguity_threshold: 0.1       # Si dos intents están muy cercanos (diferencia < 10%), es ambiguo
+
+# ============================================================================
+# POLÍTICAS DE DIÁLOGO - Cómo decide el bot qué acción tomar
+# ============================================================================
+# Las políticas determinan el siguiente paso en la conversación.
+# Se aplican en orden; la primera que coincida con la condición se ejecuta.
+#
+# Orden típico de aplicación:
+# 1. RulePolicy (reglas exactas)
+# 2. MemoizationPolicy (historias memorizadas)
+# 3. UnexpecTEDIntentPolicy (basada en intents)
+# 4. TEDPolicy (transformers - más flexible)
+# ============================================================================
 
 policies:
-- name: MemoizationPolicy
-- name: RulePolicy
-- name: UnexpecTEDIntentPolicy
-  max_history: 5
-  epochs: 100
-- name: TEDPolicy
-  max_history: 5
-  epochs: 100
-  constrain_similarities: true
+  # --------------------------------------------------------------------------
+  # POLICY 1: MEMORIZACIÓN - Recuerda historias exactas vistas en entrenamiento
+  # --------------------------------------------------------------------------
+  - name: MemoizationPolicy
+    # Si la secuencia de eventos coincide exactamente con una historia
+    # de entrenamiento, ejecuta la misma acción
+    # Muy preciso pero inflexible (no generaliza)
+
+  # --------------------------------------------------------------------------
+  # POLICY 2: REGLAS - Aplica reglas definidas explícitamente
+  # --------------------------------------------------------------------------
+  - name: RulePolicy
+    # Aplica las reglas definidas en data/rules.yml
+    # Ejemplos: "si el usuario saluda, siempre responde con saludar"
+    # Muy confiable pero requiere definir todas las reglas manualmente
+
+  # --------------------------------------------------------------------------
+  # POLICY 3: UNEXPECTEDINTENT - Usa intents para tomar decisiones
+  # --------------------------------------------------------------------------
+  - name: UnexpecTEDIntentPolicy
+    # UnexpecTED Intent Policy: Maneja intents inesperados
+    # Más rígida que TEDPolicy, basada principalmente en intents
+    max_history: 5     # Considerar los últimos 5 turnos de conversación
+    epochs: 100        # Entrenar con 100 iteraciones
+
+  # --------------------------------------------------------------------------
+  # POLICY 4: TEDPolicy - Transformers para decisiones complejas
+  # --------------------------------------------------------------------------
+  - name: TEDPolicy
+    # Transformer Embedding Dialogue Policy
+    # Modelo de deep learning más flexible y poderoso
+    # Puede aprender patrones complejos en el diálogo
+    max_history: 5     # Mantener contexto de últimos 5 turnos
+    epochs: 100        # Entrenar con 100 iteraciones
+    constrain_similarities: true  # Optimizar similitudes para mejor generalización
+
+# ID único del asistente (generado automáticamente por RASA)
+# Se usa para identificar modelos y sesiones
 assistant_id: 20251124-162948-median-object

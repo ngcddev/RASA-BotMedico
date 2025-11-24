@@ -1,0 +1,22 @@
+[
+  {
+    "name": "especialidad",
+    "pattern": "(cardiología|pediatría|medicina general|dermatología|odontología|oftalmología|neurología|traumatología|psiquiatría|ginecología|urología|endocrinología)"
+  },
+  {
+    "name": "fecha",
+    "pattern": "(lunes|martes|miércoles|jueves|viernes|sábado|domingo)"
+  },
+  {
+    "name": "fecha",
+    "pattern": "(mañana|hoy|pasado mañana)"
+  },
+  {
+    "name": "fecha",
+    "pattern": "\\d{4}-\\d{2}-\\d{2}"
+  },
+  {
+    "name": "nombre",
+    "pattern": "[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?"
+  }
+]

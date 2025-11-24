@@ -1,91 +1,199 @@
 version: "3.1"
 
 nlu:
-- intent: greet
+- regex: nombre
   examples: |
+    - [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?
+
+- regex: fecha
+  examples: |
+    - \d{4}-\d{2}-\d{2}
+    - (lunes|martes|miércoles|jueves|viernes|sábado|domingo)
+    - (mañana|hoy|pasado mañana)
+
+- regex: especialidad
+  examples: |
+    - (cardiología|pediatría|medicina general|dermatología|odontología|oftalmología|neurología|traumatología|psiquiatría|ginecología|urología|endocrinología)
+
+- intent: saludar
+  examples: |
+    - hola
+    - buenos días
+    - buenas tardes
+    - qué tal
     - hey
-    - hello
-    - hi
-    - hello there
-    - good morning
-    - good evening
-    - moin
-    - hey there
-    - let's go
-    - hey dude
-    - goodmorning
-    - goodevening
-    - good afternoon
+    - saludos
 
-- intent: goodbye
+- intent: despedir
   examples: |
-    - cu
-    - good by
-    - cee you later
-    - good night
+    - adiós
+    - hasta luego
+    - nos vemos
+    - chao
     - bye
-    - goodbye
-    - have a nice day
-    - see you around
-    - bye bye
-    - see you later
+    - gracias, eso es todo
 
-- intent: affirm
+- intent: afirmar
   examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
+    - sí
+    - correcto
+    - exacto
+    - por supuesto
+    - está bien
+    - ok
 
-- intent: deny
+- intent: negar
   examples: |
     - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
+    - negativo
+    - para nada
+    - no quiero
+    - mejor no
 
-- intent: mood_great
+- intent: pedir_cita
   examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
+    - quiero pedir una cita
+    - necesito una cita médica
+    - quisiera agendar una consulta
+    - me gustaría reservar una cita
+    - necesito ver a un doctor
+    - quiero hacer una reserva
 
-- intent: mood_unhappy
+- intent: cancelar_cita
   examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
+    - quiero cancelar mi cita
+    - necesito cancelar la cita
+    - cancelar mi reserva
+    - eliminar mi cita
 
-- intent: bot_challenge
+- intent: consultar_citas
   examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
+    - qué citas tengo
+    - cuáles son mis citas
+    - mostrar mis citas
+    - ver mis reservas
+    - tengo alguna cita
+
+- intent: proporcionar_nombre
+  examples: |
+    - mi nombre es [Juan Pérez](nombre)
+    - me llamo [María García](nombre)
+    - soy [Carlos López](nombre)
+    - [Ana Martínez](nombre)
+    - [Pedro Rodríguez](nombre)
+    - mi nombre es [Luis Hernández](nombre)
+    - me llamo [Sofia Ramírez](nombre)
+    - [Nicolas Ceron](nombre)
+    - soy [Diana Torres](nombre)
+    - [Roberto Jiménez](nombre)
+    - mi nombre completo es [Andrea Morales](nombre)
+    - [Miguel Ángel Ruiz](nombre)
+    - me llamo [Valentina Castro](nombre)
+    - soy [Fernando Ortiz](nombre)
+    - [Camila Vargas](nombre)
+    - mi nombre es [Andrés Felipe González](nombre)
+    - me llamo [Isabella Reyes](nombre)
+    - [Santiago Medina](nombre)
+    - soy [Gabriela Romero](nombre)
+    - [Mateo Silva](nombre)
+    - [Laura Mendoza](nombre)
+    - me llamo [Diego Paredes](nombre)
+    - mi nombre es [Alejandra Mora](nombre)
+    - soy [Ricardo Campos](nombre)
+    - [Natalia Cruz](nombre)
+    - [Sebastián Ríos](nombre)
+    - mi nombre es [Paula Herrera](nombre)
+    - me llamo [Javier Núñez](nombre)
+    - [Daniela Guerrero](nombre)
+    - soy [Eduardo Peña](nombre)
+    - [Carolina Soto](nombre)
+    - mi nombre completo es [Felipe Arias](nombre)
+    - [Marcela Vega](nombre)
+    - me llamo [Gustavo León](nombre)
+    - [Adriana Rojas](nombre)
+    - mi nombre es [Cristian Molina](nombre)
+    - [Paola Cortés](nombre)
+    - soy [Álvaro Delgado](nombre)
+    - [Juliana Aguilar](nombre)
+    - [Mauricio Cabrera](nombre)
+    - mi nombre es [Verónica Espinoza](nombre)
+    - me llamo [Jorge Sandoval](nombre)
+    - [Mónica Palacios](nombre)
+    - soy [Rafael Salazar](nombre)
+    - [Claudia Fuentes](nombre)
+    - [Óscar Guzmán](nombre)
+    - mi nombre es [Patricia Montoya](nombre)
+    - me llamo [Héctor Acosta](nombre)
+    - [Lorena Cervantes](nombre)
+    - soy [Raúl Zamora](nombre)
+
+- intent: proporcionar_fecha
+  examples: |
+    - para el [2025-12-15](fecha)
+    - el día [2025-11-30](fecha)
+    - [2025-12-01](fecha)
+    - para [mañana](fecha)
+    - el [lunes](fecha)
+    - [2025-11-25](fecha)
+    - para el día [2025-12-20](fecha)
+    - el [martes](fecha)
+    - [2025-12-10](fecha)
+    - para el [miércoles](fecha)
+    - el día [2025-11-28](fecha)
+    - [jueves](fecha)
+    - para el [viernes](fecha)
+    - [2025-12-05](fecha)
+    - el próximo [lunes](fecha)
+    - [2025-12-13](fecha)
+    - para el [2025-11-27](fecha)
+    - el [sábado](fecha)
+    - [domingo](fecha)
+    - para el [2025-12-25](fecha)
+    - [2025-12-08](fecha)
+    - el [2025-12-03](fecha)
+    - para [hoy](fecha)
+    - [2025-11-29](fecha)
+    - el día [2025-12-18](fecha)
+    - para el próximo [martes](fecha)
+    - [2025-12-22](fecha)
+    - el [2025-12-11](fecha)
+    - para [pasado mañana](fecha)
+    - [2025-12-16](fecha)
+    - el próximo [miércoles](fecha)
+    - [2025-12-07](fecha)
+    - para el [2025-12-30](fecha)
+    - el día [2025-12-14](fecha)
+    - [2025-12-19](fecha)
+    - para el próximo [jueves](fecha)
+    - [2025-12-24](fecha)
+    - el [2025-12-09](fecha)
+    - [2025-12-26](fecha)
+    - para el próximo [viernes](fecha)
+
+- intent: proporcionar_especialidad
+  examples: |
+    - [cardiología](especialidad)
+    - necesito [pediatría](especialidad)
+    - [medicina general](especialidad)
+    - [dermatología](especialidad)
+    - [odontología](especialidad)
+    - [oftalmología](especialidad)
+    - necesito [neurología](especialidad)
+    - [traumatología](especialidad)
+    - [psiquiatría](especialidad)
+    - [ginecología](especialidad)
+    - necesito ver [urología](especialidad)
+    - [endocrinología](especialidad)
+    - [gastroenterología](especialidad)
+    - [neumología](especialidad)
+    - [oncología](especialidad)
+    - [reumatología](especialidad)
+    - necesito [psicología](especialidad)
+    - [otorrinolaringología](especialidad)
+    - [nefrología](especialidad)
+    - [hematología](especialidad)
+    - necesito ver [cirugía general](especialidad)
+    - [infectología](especialidad)
+    - [alergología](especialidad)
+    - [anestesiología](especialidad)
+    - [medicina interna](especialidad)

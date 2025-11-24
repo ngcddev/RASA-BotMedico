@@ -1,0 +1,36 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-especialidad",
+      "2": "I-especialidad",
+      "3": "L-especialidad",
+      "4": "U-especialidad",
+      "5": "B-fecha",
+      "6": "I-fecha",
+      "7": "L-fecha",
+      "8": "U-fecha",
+      "9": "B-nombre",
+      "10": "I-nombre",
+      "11": "L-nombre",
+      "12": "U-nombre",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-especialidad": 1,
+      "I-especialidad": 2,
+      "L-especialidad": 3,
+      "U-especialidad": 4,
+      "B-fecha": 5,
+      "I-fecha": 6,
+      "L-fecha": 7,
+      "U-fecha": 8,
+      "B-nombre": 9,
+      "I-nombre": 10,
+      "L-nombre": 11,
+      "U-nombre": 12,
+      "O": 0
+    },
+    "num_tags": 13
+  }
+]

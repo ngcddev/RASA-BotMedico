@@ -1,30 +1,27 @@
 version: "3.1"
 
 stories:
-
-- story: happy path
+- story: reservar cita con form
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
+  - intent: saludar
+  - action: utter_saludar
+  - intent: pedir_cita
+  - action: cita_form
+  - active_loop: cita_form
+  - active_loop: null
+  - action: action_reservar_cita
 
-- story: sad path 1
+- story: cancelar cita
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
+  - intent: cancelar_cita
+  - action: action_cancelar_cita
 
-- story: sad path 2
+- story: consultar citas
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
-  - action: utter_goodbye
+  - intent: consultar_citas
+  - action: action_consultar_citas
+
+- story: despedida simple
+  steps:
+  - intent: despedir
+  - action: utter_despedir

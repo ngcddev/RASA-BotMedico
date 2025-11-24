@@ -1,0 +1,65 @@
+{
+  "type": "IntentMaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "afirmar": 0,
+        "back": 1,
+        "cancelar_cita": 2,
+        "consultar_citas": 3,
+        "despedir": 4,
+        "negar": 5,
+        "nlu_fallback": 6,
+        "out_of_scope": 7,
+        "pedir_cita": 8,
+        "proporcionar_especialidad": 9,
+        "proporcionar_fecha": 10,
+        "proporcionar_nombre": 11,
+        "restart": 12,
+        "saludar": 13,
+        "session_start": 14
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "action_reservar_cita": 13,
+        "action_cancelar_cita": 14,
+        "action_consultar_citas": 15,
+        "utter_cita_cancelada": 16,
+        "utter_cita_confirmada": 17,
+        "utter_despedir": 18,
+        "utter_no_comprendo": 19,
+        "utter_preguntar_especialidad": 20,
+        "utter_preguntar_fecha": 21,
+        "utter_preguntar_nombre": 22,
+        "utter_saludar": 23
+      },
+      "entities": {
+        "especialidad": 0,
+        "fecha": 1,
+        "nombre": 2
+      },
+      "slots": {
+        "nombre_0": 0,
+        "fecha_0": 1,
+        "especialidad_0": 2
+      },
+      "active_loop": {}
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

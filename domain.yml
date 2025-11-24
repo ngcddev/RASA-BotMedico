@@ -1,33 +1,85 @@
-version: "3.1"
-
 intents:
-  - greet
-  - goodbye
-  - affirm
-  - deny
-  - mood_great
-  - mood_unhappy
-  - bot_challenge
+  - saludar
+  - despedir
+  - afirmar
+  - negar
+  - pedir_cita
+  - cancelar_cita
+  - consultar_citas
+  - proporcionar_nombre
+  - proporcionar_fecha
+  - proporcionar_especialidad
+
+entities:
+  - nombre
+  - fecha
+  - especialidad
+
+slots:
+  nombre:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: nombre
+  fecha:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: fecha
+  especialidad:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: especialidad
+
+forms:
+  cita_form:
+    required_slots:
+      - nombre
+      - fecha
+      - especialidad
 
 responses:
-  utter_greet:
-  - text: "Hey! How are you?"
+  utter_saludar:
+    - text: "¡Hola! Soy el asistente de citas médicas. ¿En qué puedo ayudarte?"
+  
+  utter_despedir:
+    - text: "¡Hasta luego! Que tengas un buen día."
+  
+  utter_preguntar_nombre:
+    - text: "¿Cuál es tu nombre completo?"
+  
+  utter_preguntar_fecha:
+    - text: "¿Para qué fecha deseas la cita? (ejemplo: 2025-12-15 o lunes)"
+  
+  utter_preguntar_especialidad:
+    - text: "¿Qué especialidad necesitas? (cardiología, pediatría, medicina general, etc.)"
+  
+  utter_ask_nombre:
+    - text: "¿Cuál es tu nombre completo?"
+  
+  utter_ask_fecha:
+    - text: "¿Para qué fecha deseas la cita? (ejemplo: 2025-12-15 o lunes)"
+  
+  utter_ask_especialidad:
+    - text: "¿Qué especialidad necesitas?"
+  
+  utter_cita_confirmada:
+    - text: "Perfecto {nombre}, tu cita de {especialidad} ha sido reservada para el {fecha}."
+  
+  utter_cita_cancelada:
+    - text: "Tu cita ha sido cancelada exitosamente."
+  
+  utter_no_comprendo:
+    - text: "Disculpa, no entendí. ¿Puedes reformular tu solicitud?"
 
-  utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
-
-  utter_did_that_help:
-  - text: "Did that help you?"
-
-  utter_happy:
-  - text: "Great, carry on!"
-
-  utter_goodbye:
-  - text: "Bye"
-
-  utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+actions:
+  - action_reservar_cita
+  - action_cancelar_cita
+  - action_consultar_citas
 
 session_config:
   session_expiration_time: 60

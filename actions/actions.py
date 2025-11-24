@@ -28,7 +28,7 @@ class ActionReservarCita(Action):
             }
             citas_reservadas.append(cita)
             
-            mensaje = f"✅ Cita reservada exitosamente:\n" \
+            mensaje = f"Cita reservada exitosamente:\n" \
                      f"ID: {cita['id']}\n" \
                      f"Paciente: {nombre}\n" \
                      f"Especialidad: {especialidad}\n" \
@@ -49,7 +49,7 @@ class ActionCancelarCita(Action):
         
         if citas_reservadas:
             cita_cancelada = citas_reservadas.pop()
-            mensaje = f"❌ Cita cancelada:\n" \
+            mensaje = f"Cita cancelada:\n" \
                      f"ID: {cita_cancelada['id']}\n" \
                      f"Paciente: {cita_cancelada['nombre']}"
             dispatcher.utter_message(text=mensaje)
@@ -67,7 +67,7 @@ class ActionConsultarCitas(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
         if citas_reservadas:
-            mensaje = "📋 Citas registradas:\n\n"
+            mensaje = "Citas registradas:\n\n"
             for cita in citas_reservadas:
                 mensaje += f"ID: {cita['id']}\n" \
                           f"Paciente: {cita['nombre']}\n" \
